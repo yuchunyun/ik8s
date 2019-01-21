@@ -1,0 +1,74 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: big-ip-vs-yuchunyun
+  namespace: default
+  labels:
+    f5type: virtual-server
+data:
+  schema: "f5schemadb://bigip-virtual-server_v0.1.7.json"
+  data: |
+    {
+      "virtualServer": {
+        "backend": {
+          "servicePort": 8080,
+          "serviceName": "yuchunyun",
+          "healthMonitors": [{
+            "interval": 30,
+            "protocol": "tcp",
+            "timeout": 120
+          }]
+        },
+        "frontend": {
+          "virtualAddress": {
+            "port": 80,
+            "bindAddr": "172.16.8.9"
+          },
+          "partition": "kubernetes",
+          "balance": "least-connections-member",
+          "mode": "http"
+        }
+      }
+    }
+---
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: yuchunyun
+  namespace: default
+  labels:
+    app: yuchunyun
+spec:
+  selector:
+    app: yuchunyun
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 80
+---
+###################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-yuchunyun
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: yuchunyun
+  template:
+    metadata:
+      name: deploy-yuchunyun
+      labels:
+        app: yuchunyun
+    spec:
+      containers:
+      - name: yuchunyun
+        image: ikubernetes/myapp:v4
+        ports:
+        - name: http
+          containerPort: 80

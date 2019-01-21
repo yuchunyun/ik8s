@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-myapp
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: myapp
+      release: cannary
+  template:
+    metadata:
+      name: deploy-demo-temp
+      labels:
+        app: myapp
+        release: cannary
+    spec:
+      containers:
+      - name: deploy-myapp-c1
+        image: ikubernetes/myapp:v3
+        ports:
+        - name: http
+          containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-myapp
+  namespace: default
+spec:
+  clusterIP: None
+  selector:
+    app: myapp
+    release: cannary
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80

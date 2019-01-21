@@ -1,0 +1,101 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: big-ip-vs-dns
+  namespace: default
+  labels:
+    f5type: virtual-server
+data:
+  schema: "f5schemadb://bigip-virtual-server_v0.1.7.json"
+  data: |
+    {
+      "virtualServer": {
+        "backend": {
+          "servicePort": 53,
+          "serviceName": "mydns-tcp",
+          "healthMonitors": [{
+            "interval": 30,
+            "protocol": "tcp",
+            "timeout": 120
+          }]
+        },
+        "frontend": {
+          "virtualAddress": {
+            "port": 53,
+            "bindAddr": "172.16.8.10"
+          },
+          "partition": "kubernetes",
+          "balance": "least-connections-member",
+          "mode": "tcp"
+        }
+      }
+    }
+---
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: mydns-tcp
+  labels:
+    app: mydns
+spec:
+  selector:
+    app-a: mydns-tcp
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: domain-tcp
+    protocol: TCP
+    port: 53
+    targetPort: 53
+###################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: mydns-udp
+  labels:
+    app: mydns
+spec:
+  selector:
+    app-b: mydns-udp
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: domain-udp
+    protocol: UDP
+    port: 53
+    targetPort: 53
+---
+###################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-mydns
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app-a: mydns-tcp
+      app-b: mydns-udp
+  template:
+    metadata:
+      name: deploy-mydns
+      labels:
+        app-a: mydns-tcp
+        app-b: mydns-udp
+    spec:
+      containers:
+      - name: mydns
+        image: mydns:v1
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "/usr/sbin/named -u named -c /etc/named.conf -f"
+        ports:
+        - name: domain-tcp
+          protocol: TCP
+          containerPort: 53
+        - name: domain-udp
+          protocol: UDP
+          containerPort: 53

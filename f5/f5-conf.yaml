@@ -1,0 +1,32 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: big-ip-vs-myapp
+  namespace: ingress-nginx
+  labels:
+    f5type: virtual-server
+data:
+  schema: "f5schemadb://bigip-virtual-server_v0.1.7.json"
+  data: |
+    {
+      "virtualServer": {
+        "backend": {
+          "servicePort": 80,
+          "serviceName": "ingress-nginx",
+          "healthMonitors": [{
+            "interval": 30,
+            "protocol": "tcp",
+            "timeout": 120
+          }]
+        },
+        "frontend": {
+          "virtualAddress": {
+            "port": 80,
+            "bindAddr": "172.16.8.8"
+          },
+          "partition": "kubernetes",
+          "balance": "least-connections-member",
+          "mode": "http"
+        }
+      }
+    }
