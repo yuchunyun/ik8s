@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-reg
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: centos
+  template:
+    metadata:
+      name: deploy-reg-temp
+      labels:
+        app: centos
+    spec:
+      containers:
+      - name: deploy-reg-centos
+        image: docker.zdns.cn/devops/busybox:v1
+        command: ["/bin/sh", "-c", "sleep 3600"]
+      imagePullSecrets:
+      - name: docker.zdns.cn

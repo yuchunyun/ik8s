@@ -1,0 +1,9 @@
+apiVersion: projectcalico.org/v3
+kind: Node
+metadata:
+  creationTimestamp: null
+  name: master.k8s.notyun.com
+spec:
+  bgp:
+    ipv4Address: 202.173.9.3/25
+    ipv4IPIPTunnelAddr: 10.244.0.1

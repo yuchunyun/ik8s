@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-pvc
+  namespace: default
+  #labels: {app:myapp, tier:frontend, roll:client}
+  labels:
+    app: myapp
+    tier: frontend
+    roll: client
+spec:
+  containers:
+  - name: pod-pvc-c1
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: vol-2
+      mountPath: /usr/share/nginx/html/  
+  - name: pod-pvc-c2
+    image: busybox
+    #command: ["/bin/sh", "-c", "sleep 3600"]
+    command:
+    - "/bin/sh"
+    - "-c"
+    - "sleep 3600"
+    volumeMounts:
+    - name: vol-1
+      mountPath: /data/  
+  volumes:
+    - name: vol-1
+      persistentVolumeClaim:
+        claimName: pvc-a
+        readOnly: false
+    - name: vol-2
+      persistentVolumeClaim:
+        claimName: pvc-b
+        readOnly: false

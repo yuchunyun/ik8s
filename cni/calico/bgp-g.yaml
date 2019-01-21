@@ -1,0 +1,7 @@
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-gloabl-3
+spec:
+  asNumber: 64563
+  peerIP: 202.173.9.3

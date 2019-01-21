@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-demo
+  namespace: default
+  #labels: {app:myapp, tier:frontend, roll:client}
+  labels:
+    app: myapp
+    tier: frontend
+    roll: client
+spec:
+  containers:
+  - name: pod-demo-c1
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: vol-1
+      mountPath: /usr/share/nginx/html
+  - name: pod-demo-c2
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true;do echo $(date) >> /data/index.html;sleep 2;done"]
+    volumeMounts:
+    - name: vol-1
+      mountPath: /data/
+  volumes:
+  - name: vol-1
+    #emptyDir: {}
+    emptyDir:
+      medium: ""
+      sizeLimit: 5G

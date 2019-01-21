@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-redis
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      roll: logstor
+  template:
+    metadata:
+      name: deploy-redis-temp
+      labels:
+        app: redis
+        roll: logstor
+    spec:
+      containers:
+      - name: deploy-redis-c1
+        image: redis:4.0-alpine
+        ports:
+          - name: redis
+            containerPort: 6379
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ds-filebeat
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: filebeat
+      release: stable
+  template:
+    metadata:
+      name: ds-filebeat-temp
+      labels:
+        app: filebeat
+        release: stable
+    spec:
+      containers:
+      - name: ds-filebeat-c1
+        image: ikubernetes/filebeat:5.6.5-alpine
+        env:
+        - name: REDIS_HOST
+          value: deploy-redis.default.svc.cluster.local
+        - name: RESIS_LOG_LEVEL
+          value: info

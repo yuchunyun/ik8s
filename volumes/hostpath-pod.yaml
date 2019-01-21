@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-hostpath
+  namespace: default
+  labels:
+    app: myapp
+    tier: frontend
+    roll: client
+spec:
+  containers:
+  - name: pod-hostpath-c1
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: vol-1
+      mountPath: /usr/share/nginx/html
+  - name: pod-hostpath-c2
+    image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true;do echo $(date) >> /data/index.html;sleep 2;done"]
+    volumeMounts:
+    - name: vol-1
+      mountPath: /data/
+  volumes:
+  - name: vol-1
+    hostPath:
+      path: /root/k8s/vol
+      type: DirectoryOrCreate

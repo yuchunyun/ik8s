@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-demo
+  namespace: default
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: myapp
+      release: cannary
+  template:
+    metadata:
+      name: deploy-demo-temp
+      labels:
+        app: myapp
+        release: cannary
+    spec:
+      containers:
+      - name: deploy-demo-c1
+        image: ikubernetes/myapp:v2

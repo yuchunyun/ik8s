@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: NetworkPolicy
+metadata:
+  name: allowine
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 10.244.0.0/16
+        except:
+        - 10.244.2.0/24
+    ports:
+    - port: 80
+      protocol: TCP
+    - port: 443
+      protocol: TCP

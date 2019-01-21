@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: NetworkPolicy
+metadata:
+  name: allowone-egress
+spec:
+  podSelector:
+    matchLabels:
+      app: myapp
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 119.75.217.109/32
+    ports:
+      - port: 80
+        protocol: TCP

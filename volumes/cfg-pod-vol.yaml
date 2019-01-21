@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cfg-vol-pod
+  namespace: default
+  #labels: {app:myapp, tier:frontend, roll:client}
+  labels:
+    app: myapp
+    tier: frontend
+    roll: client
+spec:
+  containers:
+  - name: cfg-vol-pod-c1
+    image: ikubernetes/myapp:v1
+    volumeMounts:
+    - name: nginxconf
+      mountPath: /etc/nginx/conf.d/
+      readOnly: true
+  volumes:
+  - name: nginxconf
+    configMap:
+      name: cm-www

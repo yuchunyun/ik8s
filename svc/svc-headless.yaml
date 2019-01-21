@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svc-3
+  namespace: default
+spec:
+  selector:
+    app: myapp
+    release: canary
+  clusterIP: None
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 80

@@ -1,0 +1,40 @@
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-master
+spec:
+  peerIP: 202.173.9.3
+  asNumber: 64563
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-node1
+spec:
+  peerIP: 202.173.9.4
+  asNumber: 64564
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-nide2
+spec:
+  peerIP: 202.173.9.5
+  asNumber: 64565
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-node3
+spec:
+  peerIP: 202.173.9.10
+  asNumber: 64566
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: bgppeer-global-node4
+spec:
+  peerIP: 202.173.9.11
+  asNumber: 64567
+---

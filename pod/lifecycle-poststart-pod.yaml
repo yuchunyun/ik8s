@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lifecycle-poststart-pod
+  namespace: default
+spec:
+  containers:
+  - name: lifecycle-poststart-pod-c1
+    image: busybox:latest
+    imagePullPolicy: IfNotPresent
+    lifecycle:
+      postStart:
+        exec:
+          command: ["/bin/sh", "-c", "echo Home >> /tmp/index.html"]
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 3600"]

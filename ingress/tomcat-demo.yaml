@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-tomcat
+  namespace: default
+spec:
+  clusterIP: None
+  selector:
+    app: tomcat
+    release: cannary
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: ajp
+    port: 8009
+    targetPort: 8009
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-tomcat
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tomcat
+      release: cannary
+  template:
+    metadata:
+      name: deploy-demo-temp
+      labels:
+        app: tomcat
+        release: cannary
+    spec:
+      containers:
+      - name: deploy-tomcat-c1
+        image: tomcat:8.5.32-jre8-alpine
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: ajp
+          containerPort: 8009
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-tomcat
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+#  tls:
+#  - hosts:
+#    - tomcat.notyun.com
+#    secretName: tomcat-ingress-secret
+  rules:
+  - host: tomcat.notyun.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: svc-tomcat
+          servicePort: 8080
+      - path: /ajp/
+        backend:
+          serviceName: svc-tomcat
+          servicePort: 8009
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-tomcat
+  namespace: ingress-nginx
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  ports: 
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+    nodePort: 30080
+  - name: https
+    port: 443
+    targetPort: 443
+    protocol: TCP
+    nodePort: 30443
