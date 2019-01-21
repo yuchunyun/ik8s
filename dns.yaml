@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mydns
+  template:
+    metadata:
+      name: deploy-dns
+      labels:
+        app: mydns
+    spec:
+      containers:
+      - name: dns
+        image: centos
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "sleep 86400"
+        ports:
+        - name: domain
+          containerPort: 53
