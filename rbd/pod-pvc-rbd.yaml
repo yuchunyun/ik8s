@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-pvc-rbd
+spec:
+  containers:
+    - image: busybox
+      name: pod-pvc-rbd
+      command: ["sleep", "60000"]
+      volumeMounts:
+      - name: rbdpd
+        mountPath: /mnt/rbd-pvc
+        readOnly: false
+  volumes:
+    - name: rbdpd
+      persistentVolumeClaim:
+        claimName: ceph-rbd-pv-claim
