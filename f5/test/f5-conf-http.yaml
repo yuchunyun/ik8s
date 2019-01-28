@@ -1,8 +1,8 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: big-ip-vs-myapp
-  namespace: ingress-nginx
+  name: myapp-http-vs
+  namespace: default
   labels:
     f5type: virtual-server
 data:
@@ -12,10 +12,10 @@ data:
       "virtualServer": {
         "backend": {
           "servicePort": 80,
-          "serviceName": "ingress-nginx",
+          "serviceName": "myapp-http",
           "healthMonitors": [{
             "interval": 30,
-            "protocol": "tcp",
+            "protocol": "http",
             "timeout": 120
           }]
         },

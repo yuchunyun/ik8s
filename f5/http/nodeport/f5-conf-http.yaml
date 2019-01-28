@@ -1,8 +1,8 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: big-ip-vs-udp
-  namespace: ingress-nginx
+  name: myapp-http-vs
+  namespace: default
   labels:
     f5type: virtual-server
 data:
@@ -11,22 +11,22 @@ data:
     {
       "virtualServer": {
         "backend": {
-          "servicePort": 53,
-          "serviceName": "ingress-nginx-udp",
+          "servicePort": 80,
+          "serviceName": "myapp-http",
           "healthMonitors": [{
             "interval": 30,
-            "protocol": "udp",
+            "protocol": "http",
             "timeout": 120
           }]
         },
         "frontend": {
           "virtualAddress": {
-            "port": 53,
-            "bindAddr": "172.16.8.11"
+            "port": 80,
+            "bindAddr": "172.16.8.8"
           },
           "partition": "kubernetes",
           "balance": "least-connections-member",
-          "mode": "udp"
+          "mode": "http"
         }
       }
     }

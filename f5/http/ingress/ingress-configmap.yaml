@@ -1,16 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-mydns-tcp
+  name: ingress-myapp
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: myadns.notyun.com
+  - host: myapp.notyun.com
     http:
       paths:
       - path: /
         backend:
-          serviceName: mydns-tcp
-          servicePort: 53
+          serviceName: myapp-http
+          servicePort: 80

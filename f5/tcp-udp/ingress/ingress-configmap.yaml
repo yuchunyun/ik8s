@@ -12,5 +12,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: svc-myapp
+          serviceName: myapp-http
           servicePort: 80

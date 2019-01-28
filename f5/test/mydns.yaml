@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-mydns
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app-a: mydns-tcp
+      app-b: mydns-udp
+  template:
+    metadata:
+      name: deploy-mydns
+      labels:
+        app-a: mydns-tcp
+        app-b: mydns-udp
+    spec:
+      containers:
+      - name: mydns
+        image: mydns:v3
+        command:
+        - "/bin/sh"
+        - "-c"
+        - "/usr/sbin/named -u named -c /etc/named.conf -g"
+        ports:
+        - name: domain-tcp
+          protocol: TCP
+          containerPort: 53
+        - name: domain-udp
+          protocol: UDP
+          containerPort: 53
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mydns-tcp
+  labels:
+    app: mydns
+spec:
+  selector:
+    app-a: mydns-tcp
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: domain-tcp
+    protocol: TCP
+    port: 53
+    targetPort: 53
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mydns-udp
+  labels:
+    app: mydns
+spec:
+  selector:
+    app-b: mydns-udp
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: domain-udp
+    protocol: UDP
+    port: 53
+    targetPort: 53
