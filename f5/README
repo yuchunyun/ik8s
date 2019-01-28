@@ -1,0 +1,45 @@
+F5负载后后端k8s-svc（nodeport）
+
+启用k8s-bigip-ctlr
+kubectl apply -f f5.yaml 
+
+创建HTTP类型的pod和svc
+kubectl apply -f http/myapp.yaml  
+
+创建TCP/UDP类型的pod和svc
+kubectl apply -f tcp-udp/mydns.yaml 
+
+创建Ingress-nginx的pod和svc
+kubectl apply -f ingress/ingress.yaml 
+kubectl apply -f ingress/ingress-svc.yaml 
+
+方式一：F5直接负载到HTTP类型的pod的svc
+	向k8s-bigip-ctlr注入配置
+		kubectl apply -f http/nodeport/f5-conf-http.yaml 
+		
+	curl 172.16.8.8/hostname.html
+		
+方式二：F5直接负载到TCP/UDP类型的pod的svc
+	向k8s-bigip-ctlr注入配置
+		kubectl apply -f tcp-udp/nodeport/f5-conf-tcp-udp.yaml 
+		
+	dig @172.16.8.10 www.cisco.com +short
+	
+方式三：F5负载到ingress-nginx，nginx再负载到HTTP类型的pod
+	向ingress-nginx注入配置
+		kubectl apply -f http/ingress/ingress-configmap.yaml 
+	向k8s-bigip-ctlr注入配置
+		kubectl apply -f http/ingress/f5-conf-http.yaml
+		
+	curl myapp.notyun.com/hostname.html
+  
+
+注：F5的SNAT需要针对NodeIP分别设置，不能采用默认的所有地址转换
+    HTTP协议的做如下设置
+		svc.spec.externalTrafficPolicy: local 	
+		如果使用了ingress，需要修改ingress的configmap：nginx-configuration
+				cm.data.use-forwarded-headers: "true"	
+	TCP/UDP协议的做如下设置
+		1：svc.spec.externalTrafficPolicy: local 
+		2：k8s-bigip-ctlr的configmap不支持sourceAddressTranslation参数，因此需要手动将控制器内生成好的config.json文件中sourceAddressTranslation字段改为type: none
+		
